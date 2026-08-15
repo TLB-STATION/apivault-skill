@@ -1,0 +1,7 @@
+{
+  "run": {
+    "command": "npm run dev",
+    "env": "Development"
+  },
+  "vaultKey": ""
+}

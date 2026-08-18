@@ -3,7 +3,7 @@
 ## Endpoint
 
 ```
-https://api-vault-opal.vercel.app/mcp
+https://apivault-mcp.vercel.app/mcp
 ```
 
 Self-hosted: `{MCP_BASE_URL}/mcp` (defaults to production URL).

@@ -46,13 +46,19 @@ Remote MCP with OAuth. Ideal when an agent needs to browse or manage vault keys 
 
 ### Setup
 
-Add to your MCP client config:
+Use the `add-mcp` CLI to configure ApiVault MCP automatically across your tools:
+
+```bash
+npx -y add-mcp https://apivault-mcp.vercel.app/mcp -g
+```
+
+Or add directly to your client config (Cursor, Claude Desktop, Windsurf):
 
 ```json
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://api-vault-opal.vercel.app/mcp"
+      "url": "https://apivault-mcp.vercel.app/mcp"
     }
   }
 }

@@ -35,7 +35,7 @@ Add the ApiVault remote MCP endpoint to your client configuration (e.g. `mcp.jso
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://api-vault-opal.vercel.app/mcp"
+      "url": "https://apivault-mcp.vercel.app/mcp"
     }
   }
 }

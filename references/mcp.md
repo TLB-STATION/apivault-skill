@@ -161,7 +161,7 @@ The MCP server advertises this instruction string to clients:
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://api-vault-opal.vercel.app/mcp"
+      "url": "https://apivault-mcp.vercel.app/mcp"
     }
   }
 }

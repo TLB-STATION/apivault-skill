@@ -1,7 +1,8 @@
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://api-vault-opal.vercel.app/mcp"
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://apivault-mcp.vercel.app/mcp"]
     }
   }
 }

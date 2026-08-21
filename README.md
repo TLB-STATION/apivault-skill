@@ -1,11 +1,11 @@
 # ApiVault Skill
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![ApiVault Web](https://img.shields.io/badge/ApiVault-Web%20App-6366f1.svg)](https://api-vault-opal.vercel.app)
+[![ApiVault Web](https://img.shields.io/badge/ApiVault-Web%20App-6366f1.svg)](https://apivault.tech)
 [![CLI Version](https://img.shields.io/badge/CLI-v0.1.1-10b981.svg)](https://github.com/TLB-STATION/apivault)
 [![MCP Protocol](https://img.shields.io/badge/MCP-OAuth%202.1-8b5cf6.svg)](https://modelcontextprotocol.io)
 
-Official AI agent skill for **[ApiVault](https://api-vault-opal.vercel.app)** — the secure, zero-knowledge API key management vault.
+Official AI agent skill for **[ApiVault](https://apivault.tech)** — the secure, zero-knowledge API key management vault.
 
 This skill equips AI coding assistants, IDE extensions, and autonomous agents with complete knowledge and workflows for:
 1. **Remote Model Context Protocol (MCP) Server** — Scoped, revocable OAuth 2.1 integration to query, manage, and reveal API keys securely.
@@ -35,7 +35,7 @@ Add the ApiVault remote MCP endpoint to your client configuration (e.g. `mcp.jso
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://apivault-mcp.vercel.app/mcp"
+      "url": "https://mcp.apivault.tech/mcp"
     }
   }
 }
@@ -129,8 +129,8 @@ apivault-skill/
 
 ## Official Links
 
-- **Web App**: [https://api-vault-opal.vercel.app](https://api-vault-opal.vercel.app)
-- **Documentation**: [https://api-vault-opal.vercel.app/docs](https://api-vault-opal.vercel.app/docs)
+- **Web App**: [https://apivault.tech](https://apivault.tech)
+- **Documentation**: [https://apivault.tech/docs](https://apivault.tech/docs)
 - **CLI Repository**: [github.com/TLB-STATION/apivault](https://github.com/TLB-STATION/apivault)
 - **Issues & Feedback**: [github.com/TLB-STATION/apivault/issues](https://github.com/TLB-STATION/apivault/issues)
 

@@ -3,7 +3,7 @@
 ## Endpoint
 
 ```
-https://apivault-mcp.vercel.app/mcp
+https://mcp.apivault.tech/mcp
 ```
 
 Self-hosted: `{MCP_BASE_URL}/mcp` (defaults to production URL).
@@ -161,7 +161,7 @@ The MCP server advertises this instruction string to clients:
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://apivault-mcp.vercel.app/mcp"
+      "url": "https://mcp.apivault.tech/mcp"
     }
   }
 }

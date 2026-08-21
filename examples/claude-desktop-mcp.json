@@ -2,7 +2,7 @@
   "mcpServers": {
     "apivault": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://apivault-mcp.vercel.app/mcp"]
+      "args": ["-y", "mcp-remote", "https://mcp.apivault.tech/mcp"]
     }
   }
 }

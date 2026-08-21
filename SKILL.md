@@ -20,9 +20,9 @@ ApiVault is a secure API key vault with two integration surfaces:
 | **MCP server** | AI agents in Cursor, Claude Desktop, and other MCP clients | OAuth (browser approval, scoped tokens) |
 | **CLI** (`apivault`) | Terminal workflows, CI scripts, injecting secrets into local processes | Browser connect flow (`apivault login`) |
 
-Production endpoint: `https://api-vault-opal.vercel.app`
+Production endpoint: `https://apivault.tech`
 
-Website: [api-vault-opal.vercel.app](https://api-vault-opal.vercel.app) · CLI Repo: [github.com/TLB-STATION/apivault](https://github.com/TLB-STATION/apivault)
+Website: [apivault.tech](https://apivault.tech) · CLI Repo: [github.com/TLB-STATION/apivault](https://github.com/TLB-STATION/apivault)
 
 Both surfaces talk to ApiVault **over HTTP only**. Never import ApiVault server code, touch Prisma, or access the database directly.
 
@@ -49,7 +49,7 @@ Remote MCP with OAuth. Ideal when an agent needs to browse or manage vault keys 
 Use the `add-mcp` CLI to configure ApiVault MCP automatically across your tools:
 
 ```bash
-npx -y add-mcp https://apivault-mcp.vercel.app/mcp -g
+npx -y add-mcp https://mcp.apivault.tech/mcp -g
 ```
 
 Or add directly to your client config (Cursor, Claude Desktop, Windsurf):
@@ -58,7 +58,7 @@ Or add directly to your client config (Cursor, Claude Desktop, Windsurf):
 {
   "mcpServers": {
     "apivault": {
-      "url": "https://apivault-mcp.vercel.app/mcp"
+      "url": "https://mcp.apivault.tech/mcp"
     }
   }
 }
@@ -141,8 +141,8 @@ apivault --version
 **On-demand (no install):** `npx apivault <command>`
 
 **Standalone script installers:**
-- macOS / Linux: `curl -fsSL https://api-vault-opal.vercel.app/install.sh | sh`
-- Windows (PowerShell): `irm https://api-vault-opal.vercel.app/install.ps1 | iex`
+- macOS / Linux: `curl -fsSL https://apivault.tech/install.sh | sh`
+- Windows (PowerShell): `irm https://apivault.tech/install.ps1 | iex`
 
 **From source:** [github.com/TLB-STATION/apivault](https://github.com/TLB-STATION/apivault)
 

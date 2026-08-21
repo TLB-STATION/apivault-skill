@@ -47,7 +47,7 @@ Compiled into the CLI at build time:
 src/config.ts → API_BASE_URL
 ```
 
-Default: `https://api-vault-opal.vercel.app`
+Default: `https://apivault.tech`
 
 Change and rebuild for local or self-hosted development. Not user-configurable at runtime.
 
@@ -76,8 +76,8 @@ X-Vault-Key: <vault_key>    # when custom encryption enabled
 
 ## Standalone Install Scripts
 
-- **macOS / Linux:** `curl -fsSL https://api-vault-opal.vercel.app/install.sh | sh`
-- **Windows (PowerShell):** `irm https://api-vault-opal.vercel.app/install.ps1 | iex`
+- **macOS / Linux:** `curl -fsSL https://apivault.tech/install.sh | sh`
+- **Windows (PowerShell):** `irm https://apivault.tech/install.ps1 | iex`
 
 Installs standalone Node runtime bundle into `~/.local/share/apivault` and links binary without requiring npm or sudo.
 

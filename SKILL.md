@@ -24,7 +24,7 @@ Production endpoint: `https://apivault.tech`
 
 Website: [apivault.tech](https://apivault.tech) · CLI Repo: [github.com/TLB-STATION/apivault](https://github.com/TLB-STATION/apivault)
 
-Both surfaces talk to ApiVault **over HTTP only**. Never import ApiVault server code, touch Prisma, or access the database directly.
+Both surfaces communicate with ApiVault exclusively over HTTPS. Never import ApiVault server code, touch Prisma, or access the database directly.
 
 ---
 

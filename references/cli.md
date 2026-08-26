@@ -31,11 +31,22 @@ Unix file permissions: `0600` for `token.json` and `config.json`.
 }
 ```
 
-## Environment Variables
+### .apivaultrc (Project Binding)
 
-| Variable | Used by | Purpose |
+Stored in a project's local directory to bind it to an ApiVault project.
+
+```json
+{
+  "projectId": "proj_123abc"
+}
+```
+
+## Environment Variables & Flags
+
+| Variable / Flag | Used by | Purpose |
 |----------|---------|---------|
-| `APIVAULT_KEY` | reveal, add, update, run, env export | Custom vault encryption key |
+| `APIVAULT_KEY` / `--vault-key` | reveal, add, update, run, env | Custom vault encryption key |
+| `-p, --project <id>` | all commands | Override the target ApiVault project |
 | `NO_COLOR` | UI | Disable terminal colors |
 | `FORCE_COLOR=0` | UI | Disable terminal colors |
 
@@ -59,6 +70,7 @@ Change and rebuild for local or self-hosted development. Not user-configurable a
 | Login poll | POST | `/api/cli/status` | Poll pairing status with requestToken |
 | Logout | DELETE | `/api/cli/token` | Revoke CLI API token |
 | Whoami | GET | `/api/cli/me` | Return authenticated user metadata |
+| List projects | GET | `/api/projects` | List available user workspaces |
 | List keys | GET | `/api/keys` | List keys with masked preview |
 | Filter keys | GET | `/api/keys?environment=<env>` | Filter keys by environment (or `&service=`) |
 | Add key | POST | `/api/keys` | Create single encrypted key |

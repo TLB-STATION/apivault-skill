@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![ApiVault Web](https://img.shields.io/badge/ApiVault-Web%20App-6366f1.svg)](https://apivault.tech)
-[![CLI Version](https://img.shields.io/badge/CLI-v0.1.1-10b981.svg)](https://github.com/TLB-STATION/apivault)
+[![CLI Version](https://img.shields.io/badge/CLI-v1.3.1-10b981.svg)](https://github.com/TLB-STATION/apivault)
 [![MCP Protocol](https://img.shields.io/badge/MCP-OAuth%202.1-8b5cf6.svg)](https://modelcontextprotocol.io)
 
 Official AI agent skill for **[ApiVault](https://apivault.tech)** — the secure, zero-knowledge API key management vault.
@@ -43,7 +43,7 @@ Add the ApiVault remote MCP endpoint to your client configuration (e.g. `mcp.jso
 
 *Pre-configured templates are available in the [examples/](examples/) directory (`cursor-mcp.json`, `claude-desktop-mcp.json`, `vscode-mcp.json`).*
 
-On first connection, the client will open a browser window for OAuth 2.1 authorization and scope approval.
+On first connection, the client will open a browser window for OAuth 2.1 authorization. You will select a target project workspace and approve the requested scopes.
 
 ---
 

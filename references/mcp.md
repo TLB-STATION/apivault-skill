@@ -47,6 +47,13 @@ PKCE: `S256`
 
 If the client omits scope in the auth request, all three scopes are offered by default.
 
+## Project-Scoped Connections
+
+During the browser-based authorization flow (`/mcp/authorize`), the user selects a **Target Project**. The issued OAuth access token is permanently bound to this `projectId`.
+
+All tool executions (reading, writing, and revealing keys) automatically route to the selected project workspace without requiring the `projectId` to be passed in the JSON-RPC request.
+
+
 ## Token Lifetimes
 
 | Token | TTL |

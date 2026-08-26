@@ -44,6 +44,11 @@ Apply these in every workflow:
 
 Remote MCP with OAuth. Ideal when an agent needs to browse or manage vault keys from inside an IDE.
 
+### Project-Scoped Connections
+
+ApiVault supports multi-project workspaces. When an AI agent initiates an MCP connection and opens the browser for OAuth approval, the user will select a **Target Project**. 
+The resulting authorization token is permanently bound to that project. All MCP tool operations (like fetching, revealing, or adding keys) automatically route to the selected workspace, requiring no manual project IDs or CLI flags in your MCP tool payloads.
+
 ### Setup
 
 Use the `add-mcp` CLI to configure ApiVault MCP automatically across your tools:
@@ -64,14 +69,14 @@ Or add directly to your client config (Cursor, Claude Desktop, Windsurf):
 }
 ```
 
-On first use, the client opens a browser for OAuth approval. The user selects scopes and approves access.
+On first use, the client opens a browser for OAuth approval. The user selects the target project and scopes, then approves access.
 
 ### Authentication
 
 If tools return an auth error or the server status is `needsAuth`:
 
 1. Follow the MCP client's OAuth flow (reconnect the server or use the client's auth tool if provided).
-2. User approves scopes in the browser.
+2. User approves scopes and project in the browser.
 3. Retry the intended tool.
 
 Manage and revoke connections in ApiVault → **Settings → MCP Connections**.

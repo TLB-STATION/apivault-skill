@@ -173,18 +173,28 @@ apivault whoami           # verify session
 apivault logout           # revoke token
 ```
 
-Local state: `~/.apivault/` (`%USERPROFILE%\.apivault\` on Windows)
+Local state:
+- **Global**: `~/.apivault/` (`%USERPROFILE%\.apivault\` on Windows) — `token.json`, `config.json`
+- **Local**: `.apivault.json` / `.apivaultrc` in project repository root
 
 | File | Purpose |
 |------|---------|
 | `token.json` | CLI auth token |
-| `config.json` | Defaults: `run.env`, `run.command`, `vaultKey` |
+| `config.json` | Global defaults: `project`, `run.env`, `run.command`, `vaultKey` |
+| `.apivault.json` | Local per-project configuration in repository root |
 
 ### Command Reference
 
-Global flags: `--json`, `--timeout <seconds>`, `-V/--version`, `-h/--help`
+Global flags: `--json`, `--timeout <seconds>`, `-p/--project <id>`, `-V/--version`, `-h/--help`
 
 ```bash
+# Project Context & Local Directory Bindings
+apivault projects list                       # list available workspaces
+apivault projects use <id>                   # link current directory (.apivault.json)
+apivault link <id>                           # shortcut to link directory
+apivault unlink                              # remove local project binding
+apivault projects current                    # show active project & resolution source
+
 # Keys
 apivault keys list
 apivault keys get <id> [--reveal] [--vault-key <vault_key>]
@@ -196,9 +206,12 @@ apivault keys delete <id> [-f]
 apivault run --env <env> [--vault-key <vault_key>] -- <command> [args...]
 apivault run                                 # uses config defaults
 
-# Config
-apivault config list | get <key> | set <key> [value] | delete <key>
-# Valid keys: run.command, run.env, vaultKey
+# Config (supports --local / -l and --global / -g)
+apivault config list [--local | --global]
+apivault config get <key> [--local | --global]
+apivault config set <key> [value] [--local | --global]
+apivault config delete <key> [--local | --global]
+# Valid keys: project, run.command, run.env, vaultKey
 
 # Dotenv files
 apivault env export --env <env> [-o path] [--force] [--vault-key <vault_key>]
@@ -209,9 +222,11 @@ apivault env restore [-C <project-dir>]
 
 | Setting | Order (first wins) |
 |---------|-------------------|
-| Environment | `--env` → `config run.env` → error |
-| Run command | args after `--` → `config run.command` → error |
-| Vault key | `--vault-key` → `APIVAULT_KEY` env → `config vaultKey` → prompt |
+| Project Context | `-p/--project` → `APIVAULT_PROJECT` env → Local `.apivault.json` → Global `config.json` → first user project |
+| Environment | `--env` → Local `run.env` → Global `run.env` → error |
+| Run command | args after `--` → Local `run.command` → Global `run.command` → error |
+| Vault key | `--vault-key` → `APIVAULT_KEY` env → Local `vaultKey` → Global `vaultKey` → prompt |
+
 
 `APIVAULT_KEY` applies to reveal, add, update, run, and env export. On `keys add`, `--key` is the API secret value; `--vault-key` is the vault key.
 

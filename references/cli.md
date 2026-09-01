@@ -1,13 +1,17 @@
 # ApiVault CLI — Reference
 
-## Local Configuration
+## Configuration Architecture
 
+### Global Configuration (`~/.apivault/`)
 Directory: `~/.apivault/` (Windows: `%USERPROFILE%\.apivault\`)
 
-### config.json
+- **`config.json`**: System-wide defaults for `project`, `run.command`, `run.env`, and `vaultKey`.
+- **`token.json`**: Device authentication token generated upon `apivault login`.
+- Unix file permissions: `0600`.
 
 ```json
 {
+  "project": "proj_default",
   "run": {
     "command": "npm start",
     "env": "Production"
@@ -16,30 +20,27 @@ Directory: `~/.apivault/` (Windows: `%USERPROFILE%\.apivault\`)
 }
 ```
 
-Valid config keys: `run.command`, `run.env`, `vaultKey`
+### Local Project Configuration (`.apivault.json`)
+Stored in the repository root directory to bind the project context and settings locally.
 
-Unix file permissions: `0600` for `token.json` and `config.json`.
-
-### token.json
-
-```json
-{
-  "apiToken": "...",
-  "email": "user@example.com",
-  "name": "User Name",
-  "createdAt": "2026-01-01T00:00:00.000Z"
-}
-```
-
-### .apivaultrc (Project Binding)
-
-Stored in a project's local directory to bind it to an ApiVault project.
+Canonical file: `.apivault.json` (also parses `.apivaultrc`, `apivault.json`, `.apivault`)
 
 ```json
 {
-  "projectId": "proj_123abc"
+  "project": "proj_123abc",
+  "run": {
+    "command": "npm run dev",
+    "env": "Development"
+  }
 }
 ```
+
+### Resolution Priority (Highest to Lowest)
+1. Command-line flags (`-p`, `--env`, `--vault-key`)
+2. Environment variables (`APIVAULT_PROJECT`, `APIVAULT_KEY`)
+3. Local directory config (`.apivault.json`)
+4. Global user config (`~/.apivault/config.json`)
+
 
 ## Environment Variables & Flags
 

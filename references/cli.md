@@ -157,6 +157,11 @@ On `keys add`, `--key` is the **API secret value**; `--vault-key` is the vault k
 | `INVALID_VAULT_KEY` | Wrong vault key |
 | `VAULT_KEY_RATE_LIMITED` / HTTP 429 | Too many wrong vault keys; the CLI reports how long to wait |
 
+Failed commands are audited alongside successful ones: any of the above that reaches a resolved
+project is written to that project's Logs page with its status and error code, attributed to the
+signed-in user and the `cli` source. HTTP 401 is the exception — a request rejected before a
+project is resolved has no project to be filed against.
+
 ## Source Layout (apivault-cli)
 
 ```

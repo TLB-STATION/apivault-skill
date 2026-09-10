@@ -159,6 +159,13 @@ Errors return `isError: true` with a text message in tool content.
 wrong keys are throttled. A correct key clears the counter. On `VAULT_KEY_RATE_LIMITED` the tool
 message states the wait in seconds — surface it to the user instead of retrying.
 
+Failed tool calls are audited, not only successful ones. A refused or errored call is written to
+the project's Logs page with its HTTP status, the error code above, the acting user, the reported
+client name and the tool that was invoked — filed under the action attempted, so a denied
+`reveal_key` appears as a `KEY_REVEALED` entry with a 4xx status. Calls rejected before a project
+can be resolved (an invalid token, or a token with no accessible project) are not logged, because
+entries are stored per project.
+
 ## Server Instructions (embedded)
 
 The MCP server advertises this instruction string to clients:

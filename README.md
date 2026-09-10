@@ -124,6 +124,7 @@ apivault-skill/
 - **No Secret Leakage**: Raw secret values decrypted via `reveal_key` or `apivault keys get --reveal` must never be echoed into chat logs, commits, or issue trackers.
 - **Process Memory Isolation**: `apivault run` injects decrypted environment variables directly into process memory and temporarily moves `.env` files aside (`*.apivault-run-hidden`).
 - **Custom Vault Key**: In custom encryption mode, the `vault_key` is zero-knowledge and never stored by ApiVault.
+- **Everything Is Audited**: Refused and failed requests are logged next to successful ones — a wrong vault key, a throttled reveal, or a write blocked by a read-only role appears on the project's Logs page with its status, error code and the agent's reported client name. Assume every attempt is visible to the project.
 
 ---
 

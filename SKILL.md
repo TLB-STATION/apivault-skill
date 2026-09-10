@@ -133,6 +133,12 @@ Discover schemas with MCP tool inspection before calling. Summary:
 surface (MCP, CLI, and web). A correct key clears the counter, so revealing many keys in a row is
 fine; repeatedly submitting a key the user has not confirmed will lock the vault path for them.
 
+**Failed attempts are recorded.** The project's audit log captures refused and failed requests, not
+just successful ones — a wrong vault key, a throttled reveal, or a write refused by a read-only
+role each lands on the Logs page with its status and error code, attributed to the acting user and
+the client name the agent reports. Guessing is visible to the whole project, so ask the user for
+the right key instead of trying another.
+
 For OAuth endpoints, token TTLs, and protocol details, see [references/mcp.md](references/mcp.md).
 
 ---

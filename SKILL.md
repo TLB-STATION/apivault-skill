@@ -229,7 +229,22 @@ apivault config delete <key> [--local | --global]
 # Dotenv files
 apivault env export --env <env> [-o path] [--force] [--vault-key <vault_key>]
 apivault env restore [-C <project-dir>]
+
+# Audit & request logs (read-only; no secret values are ever logged)
+apivault logs                                # recent entries for the active project
+apivault logs [-n <limit>] [--page <n>]
+apivault logs --status <success|error|CODE>  # repeatable; CODE e.g. 200, 404
+apivault logs --source <cli|mcp|web|api> --method <GET|POST|PUT|DELETE>
+apivault logs --event-type <KEY_REVEALED|KEY_ROTATED|...> --user <userId> --key <idOrName>
+apivault logs --date <YYYY-MM-DD> [--end-date <YYYY-MM-DD>]
+apivault logs --search <query>               # log id, endpoint, method, source, IP, event, actor
+apivault logs --follow                       # stream new entries; `apivault logs tail` is an alias
+apivault logs get <id>                       # full detail; accepts an id prefix
 ```
+
+Use `logs` to answer "what happened to this key / project" without revealing any secret: entries
+carry endpoint, status, actor, duration, and a details payload, never a key value. With `--json`,
+`logs` returns the response object while `--follow` emits one JSON object per line.
 
 ### Resolution Precedence
 

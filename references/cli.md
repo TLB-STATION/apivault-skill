@@ -82,6 +82,9 @@ Change and rebuild for local or self-hosted development. Not user-configurable a
 | Update key | PUT | `/api/keys/:id` | Update metadata or encrypted value |
 | Delete key | DELETE | `/api/keys/:id` | Delete key permanently |
 | Decrypt | POST | `/api/keys/:id/decrypt` | Decrypt and return raw secret |
+| List logs | GET | `/api/projects/:projectId/logs` | Audit & request log entries, paginated |
+| Poll logs | GET | `/api/projects/:projectId/logs?since=<ISO>` | Entries newer than a checkpoint (live tail) |
+| Log filters | GET | `/api/projects/:projectId/logs/filters` | Distinct endpoints, users, methods, sources, statuses, keys, event types |
 
 Request headers:
 
@@ -132,6 +135,24 @@ Empty environment: warning only; command runs without injected secrets.
 4. Merge by default; `--force` replaces entirely
 5. Write header comment; `0600` permissions on Unix
 
+## apivault logs Internals
+
+Query parameters map one-to-one onto the flags: `page`, `limit` (max 1000), `status`, `source`,
+`method`, `user`, `endpoint`, `eventType`, `apiKey`/`key`, `search`, `date`, `endDate` +
+`isRange=true`, and `since`. Repeatable parameters (`status`, `source`, `method`, …) match any of
+the supplied values.
+
+- `status` takes `success` (`< 400`), `error` (`>= 400`), or an explicit code such as `404`.
+  An unrecognized value returns `400`, as does a malformed `date` / `endDate` / `since`.
+- `search` matches the entry's own id (prefix included), endpoint, method, source, IP, event
+  type, and the actor's name or email — which is how `logs get <id>` resolves a single entry.
+- `since` returns entries with `createdAt` strictly greater than the checkpoint, capped at 50 per
+  poll, so `--follow` advances its checkpoint to the newest entry it printed and never repeats one.
+- The `:projectId` path segment accepts a project id or slug, like `X-Project-Id`.
+
+`--follow` polls every 2s. Transient failures are retried at the next tick; `400`, `401`, `403`
+and `404` stop the stream and surface the error, so an expired token cannot look like idle traffic.
+
 ## keys add (Non-Interactive)
 
 ```bash
@@ -178,7 +199,8 @@ apivault-cli/
 │   │   ├── run.ts
 │   │   ├── config.ts
 │   │   ├── env.ts
-│   │   └── projects.ts       # projects list / use / current
+│   │   ├── projects.ts       # projects list / use / current
+│   │   └── logs.ts           # logs list / tail / get
 │   └── ui/format.ts          # colors, tables, JSON
 ├── dist/cli.js
 └── package.json              # bin: apivault

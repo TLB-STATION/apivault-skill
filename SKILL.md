@@ -126,7 +126,12 @@ Discover schemas with MCP tool inspection before calling. Summary:
 | `NOT_FOUND` | Key id invalid | Re-list keys |
 | `DUPLICATE_KEY` | Key name already exists in this environment | Choose a unique name, change environment, or update existing key |
 | `VAULT_KEY_REQUIRED` | Custom encryption; vault key needed | Pass `vault_key` |
-| `INVALID_VAULT_KEY` | Wrong vault key | Retry with correct key |
+| `INVALID_VAULT_KEY` | Wrong vault key | Ask the user for the correct key — never guess or re-send the same one |
+| `VAULT_KEY_RATE_LIMITED` | Too many wrong vault keys (10 per 15 min, per user and source address) | Stop. Wait the delay stated in the error, and tell the user rather than retrying |
+
+**Never brute-force a vault key.** Wrong vault keys are rate limited server-side across every
+surface (MCP, CLI, and web). A correct key clears the counter, so revealing many keys in a row is
+fine; repeatedly submitting a key the user has not confirmed will lock the vault path for them.
 
 For OAuth endpoints, token TTLs, and protocol details, see [references/mcp.md](references/mcp.md).
 
@@ -280,8 +285,9 @@ For HTTP routes, config schema, and CLI internals, see [references/cli.md](refer
 |---------|--------------|-----|
 | MCP tools unavailable | Not authenticated | Reconnect apivault MCP server; complete OAuth in browser |
 | `INSUFFICIENT_SCOPE` | Token missing scope | Re-connect with required scopes |
-| CLI HTTP 401 | Not logged in | `apivault login` |
+| CLI HTTP 401 | Not logged in, or the token expired (CLI tokens last 90 days) | `apivault login`; check the expiry with `apivault --json whoami` |
 | `VAULT_KEY_REQUIRED` | Custom encryption vault | Provide `vault_key` / `--vault-key` / `APIVAULT_KEY` |
+| HTTP 429 / `VAULT_KEY_RATE_LIMITED` | Too many wrong vault keys | Wait for the stated delay; do not retry the same key |
 | Secrets not loading in `run` | Wrong environment or no keys | Check `list_keys` / `keys list` for environment name |
 | `.env` files missing after `run` | Interrupted restore | `apivault env restore` |
 | PowerShell strips `--` | Shell parsing | CLI falls back to remaining args; quote command if needed |

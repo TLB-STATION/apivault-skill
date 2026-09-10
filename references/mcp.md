@@ -148,11 +148,16 @@ Returns confirmation object.
 | `DUPLICATE_KEY` | Key with this name already exists in the environment |
 | `VAULT_KEY_REQUIRED` | Custom encryption; `vault_key` must be provided |
 | `INVALID_VAULT_KEY` | Provided vault key is incorrect |
+| `VAULT_KEY_RATE_LIMITED` | Too many incorrect vault keys — 10 per 15 minutes, per user and source address (HTTP 429 with `Retry-After`) |
 | `VALIDATION` | Required fields missing or invalid |
 | `DECRYPT_FAILED` | Secret decryption failed |
 | `INTERNAL` | Unexpected server error |
 
 Errors return `isError: true` with a text message in tool content.
+
+`reveal_key`, `add_key` and `update_key` verify a supplied `vault_key` against a stored hash, so
+wrong keys are throttled. A correct key clears the counter. On `VAULT_KEY_RATE_LIMITED` the tool
+message states the wait in seconds — surface it to the user instead of retrying.
 
 ## Server Instructions (embedded)
 

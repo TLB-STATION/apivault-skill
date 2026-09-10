@@ -100,7 +100,11 @@ Installs standalone Node runtime bundle into `~/.local/share/apivault` and links
 2. Browser opens to connect page (`/cli/connect?rid=<requestId>`)
 3. User approves or refuses
 4. CLI polls `POST /api/cli/status { requestToken }`
-5. On approval → token saved to `token.json`
+5. On approval → `{ apiToken, expiresAt, user }` saved to `token.json`
+
+Minted tokens expire 90 days after approval. `apivault login` prints the expiry date,
+`apivault whoami` shows it (warning under 14 days), and `apivault --json whoami` returns it as
+`tokenExpiresAt` — `null` for tokens saved before expiry tracking existed.
 
 ## apivault run Internals
 
@@ -139,11 +143,12 @@ On `keys add`, `--key` is the **API secret value**; `--vault-key` is the vault k
 
 | Code / Status | Meaning |
 |---------------|---------|
-| HTTP 401 | Not signed in |
+| HTTP 401 | Not signed in, or this device's token expired or was revoked |
 | HTTP 0 | Network / connectivity failure |
 | `DUPLICATE_KEY` / HTTP 409 | A key with this name already exists in this environment |
 | `VAULT_KEY_REQUIRED` | Custom encryption; vault key needed |
 | `INVALID_VAULT_KEY` | Wrong vault key |
+| `VAULT_KEY_RATE_LIMITED` / HTTP 429 | Too many wrong vault keys; the CLI reports how long to wait |
 
 ## Source Layout (apivault-cli)
 

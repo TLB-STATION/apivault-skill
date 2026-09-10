@@ -1,4 +1,5 @@
 {
+  "project": "my-project-slug",
   "run": {
     "command": "npm run dev",
     "env": "Development"

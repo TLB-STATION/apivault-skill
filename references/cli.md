@@ -41,13 +41,16 @@ Canonical file: `.apivault.json` (also parses `.apivaultrc`, `apivault.json`, `.
 3. Local directory config (`.apivault.json`)
 4. Global user config (`~/.apivault/config.json`)
 
+The project value may be a project **id** or its **slug** — the server resolves either. Slugs are unique per owner, so a caller who belongs to two same-slug projects gets the one they own.
+
 
 ## Environment Variables & Flags
 
 | Variable / Flag | Used by | Purpose |
 |----------|---------|---------|
 | `APIVAULT_KEY` / `--vault-key` | reveal, add, update, run, env | Custom vault encryption key |
-| `-p, --project <id>` | all commands | Override the target ApiVault project |
+| `-p, --project <id\|slug>` | all commands | Override the target ApiVault project |
+| `APIVAULT_PROJECT` | all commands | Same value as `-p`, from the environment |
 | `NO_COLOR` | UI | Disable terminal colors |
 | `FORCE_COLOR=0` | UI | Disable terminal colors |
 
@@ -80,12 +83,16 @@ Change and rebuild for local or self-hosted development. Not user-configurable a
 | Delete key | DELETE | `/api/keys/:id` | Delete key permanently |
 | Decrypt | POST | `/api/keys/:id/decrypt` | Decrypt and return raw secret |
 
-Decrypt / Write request headers:
+Request headers:
 
 ```
 Authorization: Bearer <apiToken>
-X-Vault-Key: <vault_key>    # when custom encryption enabled
+User-Agent: apivault-cli/<version>
+X-Project-Id: <project id or slug>   # target workspace; omitted for /api/cli/*
+X-Vault-Key: <vault_key>             # when custom encryption enabled
 ```
+
+`POST /api/keys/:id/decrypt` carries the project as a `?projectId=` query parameter instead of the header. Both accept an id or a slug.
 
 ## Standalone Install Scripts
 
@@ -165,7 +172,8 @@ apivault-cli/
 │   │   ├── keys.ts
 │   │   ├── run.ts
 │   │   ├── config.ts
-│   │   └── env.ts
+│   │   ├── env.ts
+│   │   └── projects.ts       # projects list / use / current
 │   └── ui/format.ts          # colors, tables, JSON
 ├── dist/cli.js
 └── package.json              # bin: apivault

@@ -190,13 +190,15 @@ Local state:
 
 ### Command Reference
 
-Global flags: `--json`, `--timeout <seconds>`, `-p/--project <id>`, `-V/--version`, `-h/--help`
+Global flags: `--json`, `--timeout <seconds>`, `-p/--project <id|slug>`, `-V/--version`, `-h/--help`
+
+Anywhere a project is named — `-p/--project`, `APIVAULT_PROJECT`, or the `project` config value — pass either the project id or its slug (the name in the project URL, `apivault.tech/<username>/<slug>`). `apivault projects list` prints both.
 
 ```bash
 # Project Context & Local Directory Bindings
-apivault projects list                       # list available workspaces
-apivault projects use <id>                   # link current directory (.apivault.json)
-apivault link <id>                           # shortcut to link directory
+apivault projects list                       # list available workspaces (id + slug)
+apivault projects use <id|slug>              # link current directory (.apivault.json)
+apivault link <id|slug>                      # shortcut to link directory
 apivault unlink                              # remove local project binding
 apivault projects current                    # show active project & resolution source
 
@@ -227,7 +229,7 @@ apivault env restore [-C <project-dir>]
 
 | Setting | Order (first wins) |
 |---------|-------------------|
-| Project Context | `-p/--project` → `APIVAULT_PROJECT` env → Local `.apivault.json` → Global `config.json` → first user project |
+| Project Context (id or slug) | `-p/--project` → `APIVAULT_PROJECT` env → Local `.apivault.json` → Global `config.json` → first user project |
 | Environment | `--env` → Local `run.env` → Global `run.env` → error |
 | Run command | args after `--` → Local `run.command` → Global `run.command` → error |
 | Vault key | `--vault-key` → `APIVAULT_KEY` env → Local `vaultKey` → Global `vaultKey` → prompt |

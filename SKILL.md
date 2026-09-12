@@ -220,7 +220,7 @@ apivault run -- npm start  # no login, no ~/.apivault/, no --env needed
 
 **Environment pinning.** A token may be pinned to one environment. When it is, `run` and `env export` use it automatically — do not add `--env`. An explicit `--env` that contradicts the pin fails with `ENVIRONMENT_MISMATCH` rather than silently reading the wrong secrets. An unpinned token has no default and requires `--env`.
 
-**Writing without a terminal.** `keys add` prompts for anything not passed as a flag, so in CI supply them: `--name` and `--key` are required, `--environment` falls back to the token's pin (required when unpinned), `--service` defaults to `Custom`. A missing flag is reported as an error rather than hanging. `keys update` prompts for every field with no flag equivalent — to replace a value headlessly, `keys delete` then `keys add`.
+**Writing without a terminal.** `keys add` prompts for anything not passed as a flag, so in CI supply them: `--name` and `--key` are required, `--environment` falls back to the token's pin (required when unpinned), `--service` defaults to `Custom`. A missing flag is reported as an error rather than hanging. `keys delete` requires `-f` (or `--json`) — without a terminal to confirm on it refuses rather than assuming yes. `keys update` prompts for every field with no flag equivalent — to replace a value headlessly, `keys delete -f` then `keys add`. On a custom-vault-key project pass `--vault-key` or set `APIVAULT_KEY`, or any decrypting command stops for lack of a prompt.
 
 **Do not suggest `apivault login` when `APIVAULT_TOKEN` is set** — it refuses by design. Service tokens are revoked from the project's Service Tokens page, never with `apivault logout`.
 

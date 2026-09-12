@@ -194,6 +194,33 @@ Local state:
 | `config.json` | Global defaults: `project`, `run.env`, `run.command`, `vaultKey` |
 | `.apivault.json` | Local per-project configuration in repository root |
 
+### Headless Auth — Service Tokens (CI/CD)
+
+`apivault login` needs a browser. For pipelines, containers, and scheduled jobs, use a **service token**: a project-scoped machine credential created in the web app under **project → Service Tokens**. Shown once, prefixed `av_live_`, stored only as a hash.
+
+```bash
+export APIVAULT_TOKEN="av_live_..."
+apivault whoami            # reports the machine identity, not a person
+apivault run -- npm start  # no login, no ~/.apivault/, no --env needed
+```
+
+`APIVAULT_TOKEN` outranks a stored device token, so it also works on a machine that is already signed in.
+
+| Command | Service token | Required scope |
+|---------|---------------|----------------|
+| `keys list`, `keys get` | ✅ | `keys:read` |
+| `keys get --reveal` | ✅ | `keys:reveal` |
+| `keys add/update/delete` | ✅ | `keys:write` |
+| `env export`, `run` | ✅ | `keys:read` + `keys:reveal` |
+| `whoami`, `config`, `link` | ✅ | any / local |
+| `projects list` | ❌ | account-wide, not project-scoped |
+| `logs`, `logs tail`, `logs get` | ❌ | audit surface — read in the web app |
+| `login`, `logout` | ❌ | refused while `APIVAULT_TOKEN` is set |
+
+**Environment pinning.** A token may be pinned to one environment. When it is, `run` and `env export` use it automatically — do not add `--env`. An explicit `--env` that contradicts the pin fails with `ENVIRONMENT_MISMATCH` rather than silently reading the wrong secrets. An unpinned token has no default and requires `--env`.
+
+**Do not suggest `apivault login` when `APIVAULT_TOKEN` is set** — it refuses by design. Service tokens are revoked from the project's Service Tokens page, never with `apivault logout`.
+
 ### Command Reference
 
 Global flags: `--json`, `--timeout <seconds>`, `-p/--project <id|slug>`, `-V/--version`, `-h/--help`
@@ -251,7 +278,7 @@ carry endpoint, status, actor, duration, and a details payload, never a key valu
 | Setting | Order (first wins) |
 |---------|-------------------|
 | Project Context (id or slug) | `-p/--project` → `APIVAULT_PROJECT` env → Local `.apivault.json` → Global `config.json` → first user project |
-| Environment | `--env` → Local `run.env` → Global `run.env` → error |
+| Environment | `--env` → service token's environment pin → Local `run.env` → Global `run.env` → error |
 | Run command | args after `--` → Local `run.command` → Global `run.command` → error |
 | Vault key | `--vault-key` → `APIVAULT_KEY` env → Local `vaultKey` → Global `vaultKey` → prompt |
 
@@ -294,11 +321,13 @@ For HTTP routes, config schema, and CLI internals, see [references/cli.md](refer
 |------|-----|
 | Agent needs to look up or manage keys during a coding session | **MCP** |
 | User wants secrets injected into `npm start` / local dev server | **CLI** `run` |
-| CI/CD pipeline or shell script | **CLI** with `--json` |
+| CI/CD pipeline, container, or scheduled job | **CLI** with `APIVAULT_TOKEN` service token |
+| Shell script on a developer's own machine | **CLI** with `--json` |
 | Export `.env` for Docker / Next.js / Vite | **CLI** `env export` |
 | User asks to connect ApiVault to an MCP client | **MCP** setup |
 | Revoke AI agent access | ApiVault **Settings → MCP Connections** |
 | Revoke terminal access | `apivault logout` |
+| Revoke a pipeline's access | ApiVault **project → Service Tokens → Revoke** |
 
 ---
 
@@ -309,6 +338,10 @@ For HTTP routes, config schema, and CLI internals, see [references/cli.md](refer
 | MCP tools unavailable | Not authenticated | Reconnect apivault MCP server; complete OAuth in browser |
 | `INSUFFICIENT_SCOPE` | Token missing scope | Re-connect with required scopes |
 | CLI HTTP 401 | Not logged in, or the token expired (CLI tokens last 90 days) | `apivault login`; check the expiry with `apivault --json whoami` |
+| `APIVAULT_TOKEN was not recognised` | Service token mistyped, deleted, or from another instance | Re-copy the full `av_live_...` value; do **not** suggest `apivault login` |
+| `ENVIRONMENT_MISMATCH` | `--env` contradicts the token's environment pin | Drop `--env` and let the pin apply, or use a token pinned to that environment |
+| `INSUFFICIENT_SCOPE` on `keys add/update/delete` | Service token lacks `keys:write` | Issue a token with the scope; scopes cannot be widened after creation |
+| `not available to service tokens` | `projects list` / `logs` under `APIVAULT_TOKEN` | Use the web app, or run as a signed-in user |
 | `VAULT_KEY_REQUIRED` | Custom encryption vault | Provide `vault_key` / `--vault-key` / `APIVAULT_KEY` |
 | HTTP 429 / `VAULT_KEY_RATE_LIMITED` | Too many wrong vault keys | Wait for the stated delay; do not retry the same key |
 | Secrets not loading in `run` | Wrong environment or no keys | Check `list_keys` / `keys list` for environment name |

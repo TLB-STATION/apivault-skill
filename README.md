@@ -111,16 +111,19 @@ apivault-skill/
 | :--- | :--- | :--- |
 | Agent needs to inspect or manage credentials during coding | **MCP Server** | `list_keys`, `get_key`, `reveal_key` |
 | Developer wants secrets injected into `npm start` / dev server | **CLI** | `apivault run -- npm start` |
-| CI/CD pipeline or shell script | **CLI (JSON)** | `apivault --json keys list` |
+| CI/CD pipeline, container, or scheduled job | **CLI (service token)** | `APIVAULT_TOKEN=av_live_... apivault run -- npm start` |
+| Shell script on a developer's own machine | **CLI (JSON)** | `apivault --json keys list` |
 | Exporting `.env` for Docker Compose / Next.js | **CLI** | `apivault env export --env Production` |
 | Audit and revoke agent connections | **Web App** | Settings → MCP Connections |
 | Terminate CLI token on a machine | **CLI** | `apivault logout` |
+| Revoke a pipeline's credential | **Web App** | Project → Service Tokens → Revoke |
 
 ---
 
 ## Security Principles
 
-- **Least Privilege**: Request only the required MCP scopes (`keys:read`, `keys:write`, `keys:reveal`).
+- **Least Privilege**: Request only the required MCP scopes (`keys:read`, `keys:write`, `keys:reveal`). The same three scopes apply to service tokens, which can additionally be pinned to one environment and restricted to an IP allowlist.
+- **Machines Are Not People**: A service token (`av_live_...`) belongs to a project, not a user. It can reach keys and nothing else — never project administration, the audit log, or another project — and it cannot mint further credentials.
 - **No Secret Leakage**: Raw secret values decrypted via `reveal_key` or `apivault keys get --reveal` must never be echoed into chat logs, commits, or issue trackers.
 - **Process Memory Isolation**: `apivault run` injects decrypted environment variables directly into process memory and temporarily moves `.env` files aside (`*.apivault-run-hidden`).
 - **Custom Vault Key**: In custom encryption mode, the `vault_key` is zero-knowledge and never stored by ApiVault.

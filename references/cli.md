@@ -41,6 +41,8 @@ Canonical file: `.apivault.json` (also parses `.apivaultrc`, `apivault.json`, `.
 3. Local directory config (`.apivault.json`)
 4. Global user config (`~/.apivault/config.json`)
 
+Two exceptions under `APIVAULT_TOKEN`. The **project** is fixed by the token and needs no local config — a contradicting `-p` is refused by the server (403). The **environment** resolves `--env` → the token's pin → local config → global config, so the pin outranks config: a pinned token can only read its own environment, and a fresh CI container has no config to read.
+
 The project value may be a project **id** or its **slug** — the server resolves either. Slugs are unique per owner, so a caller who belongs to two same-slug projects gets the one they own.
 
 
@@ -48,6 +50,7 @@ The project value may be a project **id** or its **slug** — the server resolve
 
 | Variable / Flag | Used by | Purpose |
 |----------|---------|---------|
+| `APIVAULT_TOKEN` | all commands | Service token (`av_live_...`) for headless/CI auth. Outranks `~/.apivault/token.json` |
 | `APIVAULT_KEY` / `--vault-key` | reveal, add, update, run, env | Custom vault encryption key |
 | `-p, --project <id\|slug>` | all commands | Override the target ApiVault project |
 | `APIVAULT_PROJECT` | all commands | Same value as `-p`, from the environment |
@@ -86,14 +89,18 @@ Change and rebuild for local or self-hosted development. Not user-configurable a
 | Poll logs | GET | `/api/projects/:projectId/logs?since=<ISO>` | Entries newer than a checkpoint (live tail) |
 | Log filters | GET | `/api/projects/:projectId/logs/filters` | Distinct endpoints, users, methods, sources, statuses, keys, event types |
 
+**Service tokens reach only `/api/keys*` and `/api/cli/me`.** Every other route above — `/api/projects`, the logs routes, the CLI pairing routes — resolves a human user and answers a `av_live_` bearer with `401 Unauthorized`. This is a property of how those routes authenticate, not a per-route denylist, so it holds for any route not listed as service-capable.
+
 Request headers:
 
 ```
-Authorization: Bearer <apiToken>
+Authorization: Bearer <apiToken | av_live_serviceToken>
 User-Agent: apivault-cli/<version>
 X-Project-Id: <project id or slug>   # target workspace; omitted for /api/cli/*
 X-Vault-Key: <vault_key>             # when custom encryption enabled
 ```
+
+A service token carries its own project, so `X-Project-Id` is unnecessary; sending one that names a different project is refused with `403`.
 
 `POST /api/keys/:id/decrypt` carries the project as a `?projectId=` query parameter instead of the header. Both accept an id or a slug.
 
@@ -118,6 +125,7 @@ Minted tokens expire 90 days after approval. `apivault login` prints the expiry 
 
 ## apivault run Internals
 
+0. Resolve the environment: `--env` → service token pin (one `GET /api/cli/me`, service-token mode only) → local config → global config
 1. Fetch keys: `GET /api/keys?environment=<env>`
 2. Decrypt each key (prompt for vault key if needed)
 3. Rename `.env`, `.env.local`, `.env.*` → `*.apivault-run-hidden`
@@ -129,6 +137,7 @@ Empty environment: warning only; command runs without injected secrets.
 
 ## env export Internals
 
+0. Resolve the environment exactly as `run` does (see above)
 1. Fetch and decrypt keys for environment
 2. **Error** if zero keys (stricter than `run`)
 3. Parse existing output file if present
@@ -177,11 +186,20 @@ On `keys add`, `--key` is the **API secret value**; `--vault-key` is the vault k
 | `VAULT_KEY_REQUIRED` | Custom encryption; vault key needed |
 | `INVALID_VAULT_KEY` | Wrong vault key |
 | `VAULT_KEY_RATE_LIMITED` / HTTP 429 | Too many wrong vault keys; the CLI reports how long to wait |
+| `INSUFFICIENT_SCOPE` / HTTP 403 | Service token lacks the scope for this call |
+| `ENVIRONMENT_MISMATCH` / HTTP 403 | Requested environment contradicts the token's pin |
+| `SERVICE_TOKEN_EXPIRED` / `SERVICE_TOKEN_REVOKED` | Token is past its expiry, or was revoked |
+| `SERVICE_TOKEN_DENIED_IP` / HTTP 403 | Caller's address is outside the token's IP allowlist |
 
 Failed commands are audited alongside successful ones: any of the above that reaches a resolved
 project is written to that project's Logs page with its status and error code, attributed to the
 signed-in user and the `cli` source. HTTP 401 is the exception — a request rejected before a
 project is resolved has no project to be filed against.
+
+A refused **service token** is the one case that escapes that exception. Because the token names
+its project even when it is denied, expiry, revocation, IP and scope denials are all filed against
+that project with the `service` source and the token's name, so a pipeline's failed attempts are
+visible on the Logs page rather than vanishing.
 
 ## Source Layout (apivault-cli)
 
@@ -189,8 +207,9 @@ project is resolved has no project to be filed against.
 apivault-cli/
 ├── src/
 │   ├── index.ts              # Commander entry
-│   ├── config.ts             # API_BASE_URL, persistence
+│   ├── config.ts             # API_BASE_URL, persistence, APIVAULT_TOKEN mode
 │   ├── connect.ts            # login, logout, whoami
+│   ├── service-identity.ts   # service token identity + environment resolution
 │   ├── http.ts               # ApiClient, ApiError
 │   ├── run-env.ts            # dotenv hide/restore
 │   ├── env-file.ts           # parse/merge .env
